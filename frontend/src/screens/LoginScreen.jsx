@@ -22,9 +22,13 @@ export const LoginScreen = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!email || !pass) {
+      toast.error("Please provide both email and password.");
+      return;
+    }
     try {
-      const res = await login({ email, pass }).unwrap();
-      dispatch(setCredentials(...res));
+      const res = await login({ email, password: pass }).unwrap();
+      dispatch(setCredentials(res));
       navigate("/");
     } catch (err) {
       toast.error(err?.data?.message || err.error);
