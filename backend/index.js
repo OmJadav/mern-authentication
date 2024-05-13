@@ -17,9 +17,9 @@ const app = express();
 //     app.get('*', (req, res) => res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html')));
 
 const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'build')));
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+    res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
 app.use(cors())
