@@ -1,23 +1,27 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Form, Button, Col, Row } from "react-bootstrap";
-import { FormContainer } from "../components/FormContainer";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import { setCredentials } from "../slices/authSlice";
-import { useRegisterMutation } from "../slices/userApiSlice";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { Form, Button } from "react-bootstrap";
+import { FormContainer } from "../components/FormContainer";
+import { useDispatch } from "react-redux";
 import { Loader } from "../components/Loader";
+import { useUpdateUserMutation } from "../slices/userApiSlice";
 
-export const RegisterScreen = () => {
+export const ProfileScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
-  const [register, { isLoading }] = useRegisterMutation();
+  const [updateProfile, { isLoading }] = useUpdateUserMutation();
+
+  useEffect(() => {
+    setName(userInfo.name);
+    setEmail(userInfo.email);
+  }, [userInfo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,9 +29,15 @@ export const RegisterScreen = () => {
       toast.error("Password do not match");
     } else {
       try {
-        const res = await register({ name, email, password: pass }).unwrap();
+        const res = await updateProfile({
+          _id: userInfo._id,
+          name,
+          email,
+          password: pass,
+        }).unwrap();
+        console.log(res);
         dispatch(setCredentials(res));
-        navigate("/");
+        toast.success("Profile updated successfully");
       } catch (err) {
         toast.error(err?.data?.message || err.error);
       }
@@ -35,7 +45,7 @@ export const RegisterScreen = () => {
   };
   return (
     <FormContainer>
-      <h1 className="text-center">Register</h1>
+      <h1>Update Profile</h1>
       <Form onSubmit={handleSubmit}>
         <Form.Group className="my-2 " controlId="name">
           <Form.Label>Name</Form.Label>
@@ -74,16 +84,10 @@ export const RegisterScreen = () => {
           ></Form.Control>
         </Form.Group>
 
-        {isLoading && <Loader />}
         <Button type="submit" variant="primary" className="mt-3">
-          Register
+          Update
         </Button>
-
-        <Row className="py-3 ">
-          <Col>
-            Already Have an account?<Link to={"/login"}>Login</Link>
-          </Col>
-        </Row>
+        {isLoading && <Loader />}
       </Form>
     </FormContainer>
   );
